@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA-MP Server Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .stats.active {
+            display: block;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status.active {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #004085;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 SA-MP Tracker</h1>
+        <p class="subtitle">Track your GTA San Andreas Multiplayer server</p>
+
+        <div class="input-group">
+            <label for="serverIp">Server IP:</label>
+            <input type="text" id="serverIp" placeholder="e.g., 192.168.1.1" value="">
+        </div>
+
+        <div class="input-group">
+            <label for="serverPort">Server Port:</label>
+            <input type="number" id="serverPort" placeholder="e.g., 7777" value="7777">
+        </div>
+
+        <button onclick="queryServer()">Query Server</button>
+
+        <div class="status" id="status"></div>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <span class="stat-label">Players Online</span>
+                <span class="stat-value" id="playerCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Max Players</span>
+                <span class="stat-value" id="maxPlayers">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Server Name</span>
+                <span class="stat-value" id="serverName">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Gamemode</span>
+                <span class="stat-value" id="gamemode">-</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            💡 <strong>Note:</strong> Direct JavaScript querying may be limited by CORS. For production, use a backend server to query SA-MP.
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status active ${type}`;
+        }
+
+        function queryServer() {
+            const ip = document.getElementById('serverIp').value.trim();
+            const port = document.getElementById('serverPort').value.trim();
+
+            if (!ip || !port) {
+                showStatus('❌ Please enter both IP and port', 'error');
+                return;
+            }
+
+            showStatus('⏳ Querying server...', 'loading');
+
+            // Using SA-MP Query Protocol (this is a simplified example)
+            // For production, you'd want to use a backend
+            fetch(`https://api.samp-servers.net/v2/servers/${ip}:${port}`, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.server) {
+                    updateStats(data.server);
+                    showStatus('✅ Server found!', 'success');
+                } else {
+                    showStatus('❌ Server not found. Check IP and port.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatus('❌ Could not reach server. Try again later.', 'error');
+            });
+        }
+
+        function updateStats(data) {
+            document.getElementById('playerCount').textContent = data.players || 0;
+            document.getElementById('maxPlayers').textContent = data.maxplayers || 0;
+            document.getElementById('serverName').textContent = data.hostname || '-';
+            document.getElementById('gamemode').textContent = data.gamemode || '-';
+            document.getElementById('stats').classList.add('active');
+        }
+
+        // Example: auto-populate with a test server (optional)
+        // document.getElementById('serverIp').value = '192.168.1.1';
+    </script>
+</body>
+</html>
