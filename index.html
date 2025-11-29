@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SA-MP Player Count</title>
+    <title>Resend API Test</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -20,236 +20,468 @@
             align-items: center;
             padding: 20px;
         }
-
+        
         .container {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 50px 40px;
-            max-width: 500px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
             width: 100%;
-            text-align: center;
-        }
-
-        .title {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .server-info {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .player-count-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
             padding: 40px;
-            margin-bottom: 20px;
         }
-
-        .player-label {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 16px;
+        
+        h1 {
+            color: #333;
             margin-bottom: 10px;
+            font-size: 28px;
         }
-
-        .player-number {
-            color: white;
-            font-size: 60px;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .player-max {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        .status {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: none;
-            font-weight: 600;
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
             font-size: 14px;
         }
-
-        .status.active {
-            display: block;
-        }
-
-        .status.loading {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .input-group {
+        
+        .test-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
             margin-bottom: 20px;
-            text-align: left;
+            border: 2px solid #e0e0e0;
         }
-
+        
+        .test-section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
         label {
             display: block;
-            margin-bottom: 6px;
-            color: #333;
+            margin-bottom: 8px;
+            color: #555;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
         }
-
-        input {
+        
+        input, textarea {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 13px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
         }
-
-        input:focus {
+        
+        input:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
         }
-
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
         button {
-            width: 100%;
-            padding: 11px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
+        
         button:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
-
+        
         button:active {
             transform: translateY(0);
         }
-
-        .setup-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
             margin-top: 20px;
-            text-align: left;
-        }
-
-        .setup-title {
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
             font-size: 14px;
+            display: none;
         }
-
-        .setup-text {
-            color: #666;
+        
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+            display: block;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            display: block;
+        }
+        
+        .result.info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            color: #0c5460;
+            display: block;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
             font-size: 12px;
-            line-height: 1.6;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .api-key-display {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            word-break: break-all;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">🎮 SA-MP Player Count</div>
-        <div class="server-info" id="serverInfo">Your server status</div>
-
-        <div class="status" id="status"></div>
-
-        <div class="player-count-box">
-            <div class="player-label">Players Online</div>
-            <div class="player-number" id="playerCount">-</div>
-            <div class="player-max" id="playerMax"></div>
+        <h1>🚀 Resend API Tester</h1>
+        <p class="subtitle">Test your Resend email integration before deploying</p>
+        
+        <div class="api-key-display">
+            <strong>📋 API Key:</strong> re_NXvdEmPQ_NkvVGcgk5qK5NKQXgjJtYWea
         </div>
-
-        <div class="input-group">
-            <label for="serverIp">Server IP:</label>
-            <input type="text" id="serverIp" placeholder="e.g., 123.45.67.89" value="94.23.168.153">
+        
+        <!-- Test 1: Basic Email -->
+        <div class="test-section">
+            <h2>📧 Test 1: Basic Email</h2>
+            <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Send a simple test email to verify your API key works</p>
+            
+            <label for="test1-email">Your Email Address:</label>
+            <input type="email" id="test1-email" placeholder="your-email@example.com" required>
+            
+            <button onclick="runTest1()" id="test1-btn">Send Test Email</button>
+            
+            <div id="test1-result" class="result"></div>
         </div>
-
-        <div class="input-group">
-            <label for="serverPort">Server Port:</label>
-            <input type="number" id="serverPort" placeholder="e.g., 7777" value="8777">
+        
+        <!-- Test 2: Forum Form Email -->
+        <div class="test-section">
+            <h2>📝 Test 2: Forum Form Submission</h2>
+            <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Test the exact email format your forum will send</p>
+            
+            <label for="test2-email">Recipient Email:</label>
+            <input type="email" id="test2-email" placeholder="recipient@example.com" required>
+            
+            <label for="test2-username">Username:</label>
+            <input type="text" id="test2-username" placeholder="TestUser" value="TestUser">
+            
+            <label for="test2-formtype">Form Type:</label>
+            <input type="text" id="test2-formtype" placeholder="შემოთავაზება" value="შემოთავაზება">
+            
+            <label for="test2-content">Form Content:</label>
+            <textarea id="test2-content" placeholder="Test form submission...">This is a test submission from the Resend API tester.</textarea>
+            
+            <button onclick="runTest2()" id="test2-btn">Send Forum Email</button>
+            
+            <div id="test2-result" class="result"></div>
         </div>
-
-        <button onclick="queryServer()">Check Player Count</button>
-
-        <div class="setup-section">
-            <div class="setup-title">📝 Setup Instructions:</div>
-            <div class="setup-text">
-                1. Enter your SA-MP server IP (from DragonHost panel)<br>
-                2. Enter your server port<br>
-                3. Click "Check Player Count"<br>
-                4. Bookmark this page to check anytime!
-            </div>
+        
+        <!-- Test 3: Verification Email -->
+        <div class="test-section">
+            <h2>✅ Test 3: Registration Verification Email</h2>
+            <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Test the verification email sent during registration</p>
+            
+            <label for="test3-email">Test Email:</label>
+            <input type="email" id="test3-email" placeholder="test@example.com" required>
+            
+            <label for="test3-username">Username:</label>
+            <input type="text" id="test3-username" placeholder="NewUser" value="NewUser">
+            
+            <button onclick="runTest3()" id="test3-btn">Send Verification Email</button>
+            
+            <div id="test3-result" class="result"></div>
         </div>
     </div>
 
     <script>
-        function showStatus(message, type) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = `status active ${type}`;
+        const API_KEY = 're_NXvdEmPQ_NkvVGcgk5qK5NKQXgjJtYWea';
+        
+        function showResult(elementId, message, type, details = null) {
+            const el = document.getElementById(elementId);
+            el.className = `result ${type}`;
+            el.innerHTML = message;
+            
+            if (details) {
+                el.innerHTML += `<div class="code-block">${JSON.stringify(details, null, 2)}</div>`;
+            }
         }
-
-        function queryServer() {
-            const ip = document.getElementById('serverIp').value.trim();
-            const port = document.getElementById('serverPort').value.trim();
-
-            if (!ip || !port) {
-                showStatus('❌ Please enter both IP and port', 'error');
+        
+        async function runTest1() {
+            const btn = document.getElementById('test1-btn');
+            const email = document.getElementById('test1-email').value.trim();
+            
+            if (!email || !email.includes('@')) {
+                showResult('test1-result', '❌ Please enter a valid email address', 'error');
                 return;
             }
-
-            showStatus('⏳ Checking server...', 'loading');
-
-            // Query SA-MP server using the SAMP-Servers API
-            const serverAddress = `${ip}:${port}`;
             
-            fetch(`https://api.samp-servers.net/v2/servers/${serverAddress}`, {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.server) {
-                    const players = data.server.players || 0;
-                    const maxPlayers = data.server.maxplayers || 0;
-                    
-                    document.getElementById('playerCount').textContent = players;
-                    document.getElementById('playerMax').textContent = `/ ${maxPlayers}`;
-                    document.getElementById('serverInfo').textContent = `${serverAddress} • ${data.server.hostname || 'SA-MP Server'}`;
-                    
-                    showStatus(`✅ Updated - ${new Date().toLocaleTimeString()}`, 'success');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Sending...';
+            showResult('test1-result', '⏳ Sending email...', 'info');
+            
+            try {
+                const response = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: 'Zaratic Test <onboarding@resend.dev>',
+                        to: [email],
+                        subject: '✅ Resend API Test - Success!',
+                        html: `
+                            <h1 style="color: #667eea;">🎉 Test Email Successful!</h1>
+                            <p>If you're reading this, your Resend API key is working correctly!</p>
+                            <p><strong>API Key:</strong> ${API_KEY.substring(0, 15)}...</p>
+                            <p style="color: #666; font-size: 12px;">Sent from Resend API Tester</p>
+                        `
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('test1-result', 
+                        `✅ <strong>Success!</strong> Email sent successfully.<br>Email ID: ${data.id}<br>Check your inbox at: <strong>${email}</strong>`, 
+                        'success', 
+                        data
+                    );
                 } else {
-                    document.getElementById('playerCount').textContent = '-';
-                    document.getElementById('playerMax').textContent = '';
-                    showStatus('❌ Server not found. Check IP and port.', 'error');
+                    showResult('test1-result', 
+                        `❌ <strong>Error:</strong> ${data.message || 'Unknown error'}`, 
+                        'error', 
+                        data
+                    );
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('playerCount').textContent = '-';
-                document.getElementById('playerMax').textContent = '';
-                showStatus('❌ Could not reach server. Try again.', 'error');
-            });
+            } catch (error) {
+                showResult('test1-result', `❌ <strong>Network Error:</strong> ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Send Test Email';
+            }
+        }
+        
+        async function runTest2() {
+            const btn = document.getElementById('test2-btn');
+            const email = document.getElementById('test2-email').value.trim();
+            const username = document.getElementById('test2-username').value.trim();
+            const formType = document.getElementById('test2-formtype').value.trim();
+            const content = document.getElementById('test2-content').value.trim();
+            
+            if (!email || !email.includes('@')) {
+                showResult('test2-result', '❌ Please enter a valid email address', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Sending...';
+            showResult('test2-result', '⏳ Sending forum email...', 'info');
+            
+            const formData = {
+                '👤 მომხმარებელი': username,
+                '📧 ელფოსტა': email,
+                '⏰ გაგზავნის დრო': new Date().toLocaleString('ka-GE'),
+                '': '━━━━━━━━━━━━━━━━━━━━━━━━━━',
+                'შემოთავაზების სათაური': 'Test Suggestion',
+                'დეტალები': content
+            };
+            
+            let formFields = '';
+            for (const [key, value] of Object.entries(formData)) {
+                formFields += `
+                    <tr>
+                        <td style="padding: 12px; border: 1px solid #30363d; background: #0d1117; font-weight: bold; color: #00ffff; width: 30%;">
+                            ${key}
+                        </td>
+                        <td style="padding: 12px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9;">
+                            ${String(value).replace(/\n/g, '<br>')}
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            try {
+                const response = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: 'Zaratic Forum <onboarding@resend.dev>',
+                        to: [email],
+                        subject: `🔔 თქვენი ${formType} მიღებულია - Zaratic Forum`,
+                        html: `
+                            <!DOCTYPE html>
+                            <html>
+                            <head><meta charset="utf-8"></head>
+                            <body style="font-family: Arial, sans-serif; background: #0d1117; color: #c9d1d9; padding: 40px 20px;">
+                                <div style="max-width: 700px; margin: 0 auto; background: #161b22; padding: 40px; border-radius: 12px; border: 2px solid #00ffff;">
+                                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #30363d; padding-bottom: 20px;">
+                                        <h1 style="color: #00ffff; margin: 0 0 10px 0;">🎮 Zaratic Role Play</h1>
+                                        <p style="color: #8b949e; margin: 0;">თქვენი მოთხოვნის დადასტურება</p>
+                                    </div>
+                                    
+                                    <div style="background: #1a472a; border: 1px solid #2ea043; color: #7ee787; padding: 16px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                                        ✅ თქვენი მოთხოვნა წარმატებით მიღებულია!
+                                    </div>
+                                    
+                                    <div style="background: linear-gradient(135deg, #00ffff, #0066ff); color: #000; padding: 12px 20px; border-radius: 8px; font-weight: bold; margin: 20px 0; text-align: center;">
+                                        ${formType}
+                                    </div>
+                                    
+                                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                                        ${formFields}
+                                    </table>
+                                    
+                                    <div style="margin-top: 30px; text-align: center; color: #8b949e; font-size: 12px; border-top: 1px solid #30363d; padding-top: 20px;">
+                                        <p>ეს წერილი გაიგზავნა ავტომატურად <strong>Zaratic Forum</strong> სისტემიდან</p>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>
+                        `
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('test2-result', 
+                        `✅ <strong>Success!</strong> Forum email sent.<br>Email ID: ${data.id}<br>Check inbox: <strong>${email}</strong>`, 
+                        'success', 
+                        data
+                    );
+                } else {
+                    showResult('test2-result', 
+                        `❌ <strong>Error:</strong> ${data.message || 'Unknown error'}`, 
+                        'error', 
+                        data
+                    );
+                }
+            } catch (error) {
+                showResult('test2-result', `❌ <strong>Network Error:</strong> ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Send Forum Email';
+            }
+        }
+        
+        async function runTest3() {
+            const btn = document.getElementById('test3-btn');
+            const email = document.getElementById('test3-email').value.trim();
+            const username = document.getElementById('test3-username').value.trim();
+            const code = Math.floor(10000000 + Math.random() * 90000000).toString();
+            
+            if (!email || !email.includes('@')) {
+                showResult('test3-result', '❌ Please enter a valid email address', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Sending...';
+            showResult('test3-result', '⏳ Sending verification email...', 'info');
+            
+            try {
+                const response = await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: 'Zaratic Forum <onboarding@resend.dev>',
+                        to: [email],
+                        subject: '✅ Zaratic Forum-ის ვერიფიკაციის კოდი',
+                        html: `
+                            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px; background: #f5f5f5;">
+                                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                                    <h1 style="color: #333; margin-bottom: 20px;">მოგესალმებით, ${username}!</h1>
+                                    <p style="color: #666; font-size: 16px; margin-bottom: 20px;">თქვენი ვერიფიკაციის კოდია:</p>
+                                    <h2 style="color: #00ffff; font-size: 32px; text-align: center; border: 2px solid #0066ff; padding: 20px; background: #161b22; border-radius: 8px; letter-spacing: 4px;">
+                                        ${code}
+                                    </h2>
+                                    <p style="color: #666; font-size: 14px; margin-top: 20px;">გთხოვთ, შეიყვანოთ ეს კოდი თქვენი ანგარიშის დასადასტურებლად.</p>
+                                    <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px;">
+                                        თუ თქვენ არ მოითხოვეთ ეს კოდი, უგულებელყავით ეს წერილი.
+                                    </p>
+                                </div>
+                            </div>
+                        `,
+                        text: `თქვენი ვერიფიკაციის კოდია: ${code}`
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('test3-result', 
+                        `✅ <strong>Success!</strong> Verification email sent.<br>Verification Code: <strong>${code}</strong><br>Email ID: ${data.id}<br>Check inbox: <strong>${email}</strong>`, 
+                        'success', 
+                        data
+                    );
+                } else {
+                    showResult('test3-result', 
+                        `❌ <strong>Error:</strong> ${data.message || 'Unknown error'}`, 
+                        'error', 
+                        data
+                    );
+                }
+            } catch (error) {
+                showResult('test3-result', `❌ <strong>Network Error:</strong> ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Send Verification Email';
+            }
         }
     </script>
 </body>
