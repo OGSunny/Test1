@@ -1,23 +1,115 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SA-MP Test HUD</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>SA-MP Notification HUD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: transparent;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 9999;
+        }
+
+        .notification {
+            background: linear-gradient(135deg, rgba(0, 200, 0, 0.95), rgba(0, 150, 0, 0.95));
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #00ff00;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+            font-size: 16px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, rgba(200, 0, 0, 0.95), rgba(150, 0, 0, 0.95));
+            border-left-color: #ff0000;
+        }
+
+        .notification.warning {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.95), rgba(200, 100, 0, 0.95));
+            border-left-color: #ffaa00;
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, rgba(0, 150, 200, 0.95), rgba(0, 100, 150, 0.95));
+            border-left-color: #00aaff;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .notification.remove {
+            animation: slideOut 0.4s ease-out;
+        }
+    </style>
 </head>
 <body>
-    <div id="hud-container">
-        <h2>PLAYER STATUS</h2>
-        <div class="stat-row">
-            <p>Health:</p>
-            <div id="health-bar-bg"><div id="health-bar-fill"></div></div>
-            <span id="health-text">100%</span>
-        </div>
-        <div class="stat-row">
-            <p>Money:</p>
-            <span id="money-text">$500</span>
-        </div>
-    </div>
-    
-    <script src="script.js"></script>
+    <div id="notification-container"></div>
+
+    <script>
+        function showNotification(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('notification-container');
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            
+            if (type === 'error') {
+                notification.classList.add('error');
+            } else if (type === 'warning') {
+                notification.classList.add('warning');
+            } else if (type === 'info') {
+                notification.classList.add('info');
+            }
+            
+            notification.innerText = message;
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('remove');
+                setTimeout(() => notification.remove(), 400);
+            }, duration);
+        }
+
+        // Test notifications (remove these when done testing)
+        window.addEventListener('load', () => {
+            console.log('HUD Loaded');
+        });
+    </script>
 </body>
 </html>
